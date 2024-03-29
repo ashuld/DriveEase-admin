@@ -1,13 +1,16 @@
 import 'dart:developer';
 
 import 'package:drive_ease_admin/view/core/colors.dart';
+import 'package:drive_ease_admin/view/providers/firebase_auth_provider.dart';
 import 'package:drive_ease_admin/view/screens/screen_booking_history.dart';
 import 'package:drive_ease_admin/view/screens/screen_car_list.dart';
 import 'package:drive_ease_admin/view/screens/screen_driver_list.dart';
 import 'package:drive_ease_admin/view/screens/screen_location_list.dart';
 import 'package:drive_ease_admin/view/widgets/home_widgets.dart';
+import 'package:drive_ease_admin/view/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class ScreenHome extends StatelessWidget {
@@ -32,74 +35,54 @@ class ScreenHome extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          HomeGestureButton(
-                            image: 'assets/icons/icons8-car-96.png',
-                            option: 'Car \nManagement',
-                            onTapCallback: () {
-                              log('button 1');
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const ScreenCarList(),
-                                  ));
-                            },
-                          ),
-                          const SizedBox(
-                            width: 2,
-                          ),
-                          HomeGestureButton(
-                            image: 'assets/icons/icons8-driving-96.png',
-                            option: 'Driver \nManagement',
-                            onTapCallback: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ScreenDriverLIst(),
-                                  ));
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          HomeGestureButton(
-                              image: 'assets/icons/icons8-order-history-96.png',
-                              option: 'Booking \nHistory',
-                              onTapCallback: () {
-                                log('button 3');
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ScreenBookingHistory(),
-                                    ));
-                              }),
-                          const SizedBox(
-                            width: 2,
-                          ),
-                          HomeGestureButton(
-                              image:
-                                  'assets/icons/icons8-map-marker-96 (1).png',
-                              option: 'Pickup \nLocation',
-                              onTapCallback: () {
-                                log('button 4');
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ScreenLocationList(),
-                                    ));
-                              }),
-                        ],
-                      )
+                      row1(context),
+                      const SizedBox(height: 25),
+                      row2(context),
+                      const SizedBox(height: 25),
+                      HomeGestureButton(
+                          option: 'Sign Out',
+                          onTapCallback: () {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text(
+                                    'Are you sure you want to sign out?',
+                                    style: textStyle(
+                                        color: AppColors.secondaryColor),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        'No',
+                                        style: textStyle(
+                                            color: AppColors.secondaryColor),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        final auth =
+                                            Provider.of<FirebaseAuthProvider>(
+                                                context,
+                                                listen: false);
+                                        await auth.signOut(context);
+                                      },
+                                      child: Text(
+                                        'Yes',
+                                        style: textStyle(
+                                            color: AppColors.secondaryColor),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          image: 'assets/icons/icons8-sign-out-96.png')
                     ],
                   )
                 ],
@@ -108,6 +91,69 @@ class ScreenHome extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Row row2(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        HomeGestureButton(
+            image: 'assets/icons/icons8-order-history-96.png',
+            option: 'Booking \nHistory',
+            onTapCallback: () {
+              log('button 3');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ScreenBookingHistory(),
+                  ));
+            }),
+        const SizedBox(width: 2),
+        HomeGestureButton(
+            image: 'assets/icons/icons8-map-marker-96 (1).png',
+            option: 'Pickup \nLocation',
+            onTapCallback: () {
+              log('button 4');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ScreenLocationList(),
+                  ));
+            }),
+      ],
+    );
+  }
+
+  Row row1(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        HomeGestureButton(
+          image: 'assets/icons/icons8-car-96.png',
+          option: 'Car \nManagement',
+          onTapCallback: () {
+            log('button 1');
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ScreenCarList(),
+                ));
+          },
+        ),
+        const SizedBox(width: 2),
+        HomeGestureButton(
+          image: 'assets/icons/icons8-driving-96.png',
+          option: 'Driver \nManagement',
+          onTapCallback: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ScreenDriverLIst(),
+                ));
+          },
+        ),
+      ],
     );
   }
 

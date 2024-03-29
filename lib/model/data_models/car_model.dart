@@ -21,17 +21,18 @@ class Car {
     required this.seats,
   });
 
-  factory Car.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  factory Car.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    final data = doc.data()!;
     return Car(
       carId: doc.id,
-      name: data['name'],
-      rentalAmount: data['rentalAmount'],
-      quantity: data['quantity'],
-      category: data['category'],
-      gearType: data['gearType'],
-      image: data['image'],
-      seats: data['seats'],
+      name: data['carName'] ?? '', // Handle null or missing data
+      rentalAmount:
+          (data['rentalAmount'] ?? 0).toDouble(), // Handle null or missing data
+      quantity: data['quantity'] ?? 0, // Handle null or missing data
+      gearType: data['gearType'] ?? '', // Handle null or missing data
+      seats: data['seats'] ?? '', // Handle null or missing data
+      category: data['category'] ?? '', // Handle null or missing data
+      image: data['carImage'] ?? '', // Handle null or missing data
     );
   }
 

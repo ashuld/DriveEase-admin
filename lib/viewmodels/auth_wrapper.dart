@@ -1,8 +1,5 @@
-import 'dart:developer';
-
 import 'package:drive_ease_admin/view/core/colors.dart';
 import 'package:drive_ease_admin/view/providers/connectivity_provider.dart';
-import 'package:drive_ease_admin/view/providers/firebase_auth_provider.dart';
 import 'package:drive_ease_admin/view/screens/home_screen.dart';
 import 'package:drive_ease_admin/view/screens/login_screen.dart';
 import 'package:drive_ease_admin/view/widgets/network_error.dart';
@@ -16,7 +13,6 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<FirebaseAuthProvider>(context, listen: false);
     return Consumer<ConnectivityProvider>(
         builder: (context, connectivity, child) {
       if (!connectivity.isDeviceConnected) {
@@ -45,22 +41,7 @@ class AuthWrapper extends StatelessWidget {
               if (!isLoggedIn) {
                 return const ScreenLogin();
               } else {
-                return FutureBuilder(
-                  future: auth.getCurrentAdminId(),
-                  builder: (context, idSnapshot) {
-                    if (idSnapshot.connectionState == ConnectionState.waiting) {
-                      return const Scaffold(
-                        body: Center(child: CircularProgressIndicator()),
-                      );
-                    } else {
-                      log(Provider.of<FirebaseAuthProvider>(context,
-                                  listen: true)
-                              .adminId ??
-                          'not found');
-                      return const ScreenHome();
-                    }
-                  },
-                );
+                return const ScreenHome();
               }
             }
           },

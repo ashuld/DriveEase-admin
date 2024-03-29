@@ -1,8 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:drive_ease_admin/view/core/colors.dart';
 import 'package:drive_ease_admin/view/core/const_widgets.dart';
+import 'package:drive_ease_admin/view/providers/connectivity_provider.dart';
+import 'package:drive_ease_admin/view/providers/firebase_firestore_provider.dart';
+import 'package:drive_ease_admin/view/widgets/network_error.dart';
 import 'package:drive_ease_admin/view/widgets/widgets.dart';
 import 'package:drive_ease_admin/viewmodels/car_provider.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +34,7 @@ class ScreenCarAdd extends StatelessWidget {
             scrollDirection: Axis.vertical,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(
                   height: 1.h,
@@ -57,109 +62,147 @@ class ScreenCarAdd extends StatelessWidget {
                           ],
                         ),
                         ConstWidgets.sizeH20,
-                        InkWell(
-                          onTap: () async {
-                            //function to check whether the image is selected or not
-                            if (carProvider.selectedImage == null) {
-                              showSnackBar(
-                                  context: context,
-                                  message: 'Please select an image');
-                              return;
-                            }
-                            if (nameController.text.trim().isEmpty) {
-                              showSnackBar(
-                                  context: context,
-                                  message: 'Please Input car name');
-                              return;
-                            }
-                            if (rentalAmountController.text.trim().isEmpty) {
-                              showSnackBar(
-                                  context: context,
-                                  message: 'Please Input rental amount');
-                              return;
-                            }
-                            if (quantityController.text.trim().isEmpty) {
-                              showSnackBar(
-                                  context: context,
-                                  message: 'Please Input No. of Cars');
-                              return;
-                            }
-                            final carName = nameController.text.trim();
-                            double? rentalAmount;
-                            int? quantity;
-                            String? errorMsg;
-                            try {
-                              rentalAmount = double.tryParse(
-                                  rentalAmountController.text.trim());
-                              if (rentalAmount == null) {
-                                throw const FormatException('null');
-                              } else if (rentalAmount < 200) {
-                                throw const FormatException('not 200');
-                              }
-                            } catch (e) {
-                              if (e is FormatException &&
-                                  e.message == 'not 200') {
-                                errorMsg = 'Amount should not be less than 200';
-                              } else if (e is FormatException &&
-                                  e.message == 'null') {
-                                errorMsg = 'Invalid amount';
-                              }
-                            }
-                            try {
-                              quantity =
-                                  int.tryParse(quantityController.text.trim());
-                              if (quantity == null) {
-                                throw const FormatException('null');
-                              } else if (quantity < 1 || quantity > 10) {
-                                throw const FormatException('range error');
-                              }
-                            } catch (e) {
-                              if (e is FormatException &&
-                                  e.message == 'range error') {
-                                errorMsg =
-                                    'Minimum no of cars that can be added is 1 and maximum is 10';
-                              } else if (e is FormatException &&
-                                  e.message == 'null') {
-                                errorMsg = 'Invaild No. of cars';
-                              }
-                            }
-                            if (errorMsg != null) {
-                              showSnackBar(context: context, message: errorMsg);
-                            } else {
-                              log('validation completed');
-                              log(rentalAmount.toString());
-                            }
-                          },
-                          child: Container(
-                            width: 50.w,
-                            height: 6.2.h,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              border:
-                                  Border.all(color: AppColors.secondaryColor),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Submit',
-                                  style: textStyle(
-                                    size: 25,
-                                    color: AppColors.secondaryColor,
-                                    thickness: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        ConstWidgets.sizeH20,
+                        // submit(carProvider, context, nameController,
+                        //     rentalAmountController, quantityController),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(15),
+        child: SizedBox(
+          height: 50,
+          child: submit(carProvider, context, nameController,
+              rentalAmountController, quantityController),
+        ),
+      ),
+    );
+  }
+
+  Align submit(
+      CarProvider carProvider,
+      BuildContext context,
+      TextEditingController nameController,
+      TextEditingController rentalAmountController,
+      TextEditingController quantityController) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: InkWell(
+        onTap: () async {
+          //function to check whether the image is selected or not
+          if (carProvider.selectedImage == null) {
+            showSnackBar(context: context, message: 'Please select an image');
+            return;
+          }
+          if (nameController.text.trim().isEmpty) {
+            showSnackBar(context: context, message: 'Please Input car name');
+            return;
+          }
+          if (rentalAmountController.text.trim().isEmpty) {
+            showSnackBar(
+                context: context, message: 'Please Input rental amount');
+            return;
+          }
+          if (quantityController.text.trim().isEmpty) {
+            showSnackBar(context: context, message: 'Please Input No. of Cars');
+            return;
+          }
+          final carName = nameController.text.trim();
+          double? rentalAmount;
+          int? quantity;
+          String? errorMsg;
+          try {
+            rentalAmount = double.tryParse(rentalAmountController.text.trim());
+            if (rentalAmount == null) {
+              throw const FormatException('null');
+            } else if (rentalAmount < 200) {
+              throw const FormatException('not 200');
+            }
+          } catch (e) {
+            if (e is FormatException && e.message == 'not 200') {
+              errorMsg = 'Amount should not be less than 200';
+            } else if (e is FormatException && e.message == 'null') {
+              errorMsg = 'Invalid amount';
+            }
+          }
+          try {
+            quantity = int.tryParse(quantityController.text.trim());
+            if (quantity == null) {
+              throw const FormatException('null');
+            } else if (quantity < 1 || quantity > 10) {
+              throw const FormatException('range error');
+            }
+          } catch (e) {
+            if (e is FormatException && e.message == 'range error') {
+              errorMsg =
+                  'Minimum no of cars that can be added is 1 and maximum is 10';
+            } else if (e is FormatException && e.message == 'null') {
+              errorMsg = 'Invaild No. of cars';
+            }
+          }
+          if (errorMsg != null) {
+            showSnackBar(context: context, message: errorMsg);
+          } else {
+            final connectivity =
+                Provider.of<ConnectivityProvider>(context, listen: false);
+            if (!connectivity.isDeviceConnected) {
+              networkDialog(context);
+            } else {
+              loadingDialog(context);
+              log('car name $carName');
+              log('rental amount $rentalAmount');
+              log('quantity $quantity');
+              log('gear type ${carProvider.selectedGearType}');
+              log('seats ${carProvider.selectedSeats}');
+              log('category ${carProvider.selectedCategory}');
+              final fireStoreProvider =
+                  Provider.of<FireStoreProvider>(context, listen: false);
+              await fireStoreProvider.addCarDetailsToFirestore(
+                  context: context,
+                  carName: carName,
+                  rentalAmount: rentalAmount!,
+                  quantity: quantity!,
+                  gearType: carProvider.selectedGearType,
+                  seats: carProvider.selectedSeats.toString(),
+                  category: carProvider.selectedCategory);
+              Provider.of<CarProvider>(context, listen: false).resetAll();
+              Navigator.pop(context);
+            }
+          }
+        },
+        child: Container(
+          width: 50.w,
+          height: 6.2.h,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade700, // Greyish color
+            borderRadius: BorderRadius.circular(12), // Rounded corners
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.shade800, // Shadow color
+                offset: const Offset(0, 4), // Offset in X and Y direction
+                blurRadius: 6, // Spread of the shadow
+                spreadRadius: 2, // Size of the shadow
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Submit',
+                style: textStyle(
+                  size: 25,
+                  color: AppColors.secondaryColor,
+                  thickness: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -390,8 +433,8 @@ class ScreenCarAdd extends StatelessWidget {
         onTap: () => carProvider.pickImage(),
         child: Consumer<CarProvider>(builder: (context, provider, child) {
           return Container(
-            height: 20.h,
-            width: 60.w,
+            height: 30.h,
+            width: 70.w,
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.enabled),
               borderRadius: BorderRadius.circular(8),
@@ -401,7 +444,7 @@ class ScreenCarAdd extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     child: Image.file(
                       File(carProvider.selectedImage!),
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fill,
                     ),
                   )
                 : const Icon(

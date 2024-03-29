@@ -19,24 +19,12 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(
-      create: (context) => FireStoreProvider(),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => CarProvider(),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => CarListProvider(),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => FirebaseAuthProvider(),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => ConnectivityProvider(),
-    ),
-    ChangeNotifierProvider(
-      create: (context) => UtilsProvider(),
-    )
+    ChangeNotifierProvider(create: (context) => FireStoreProvider()),
+    ChangeNotifierProvider(create: (context) => CarProvider()),
+    ChangeNotifierProvider(create: (context) => CarListProvider()),
+    ChangeNotifierProvider(create: (context) => FirebaseAuthProvider()),
+    ChangeNotifierProvider(create: (context) => ConnectivityProvider()),
+    ChangeNotifierProvider(create: (context) => UtilsProvider())
   ], child: const MyApp()));
 }
 

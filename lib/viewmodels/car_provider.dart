@@ -38,4 +38,12 @@ class CarProvider extends ChangeNotifier {
     _selectedCategory = category;
     notifyListeners();
   }
+
+  void resetAll() {
+    _selectedImage = null;
+    selectedImage8 = null;
+    _selectedCategory = 'Mini';
+    _selectedGearType = 'Automatic';
+    _selectedSeats = 4;
+  }
 }

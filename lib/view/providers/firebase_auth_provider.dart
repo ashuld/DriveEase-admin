@@ -2,15 +2,14 @@
 
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drive_ease_admin/view/screens/home_screen.dart';
+import 'package:drive_ease_admin/view/screens/login_screen.dart';
 import 'package:drive_ease_admin/view/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class FirebaseAuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
   String? _adminId;
 
@@ -24,12 +23,12 @@ class FirebaseAuthProvider extends ChangeNotifier {
       loadingDialog(context);
       UserCredential admin = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
-      Navigator.pop(context);
-      log('sign in succes');
       if (admin.user == null) {
         showSnackBar(context: context, message: 'Admin-Data Not Found');
       } else {
-        await getCurrentAdminId();
+        log(admin.user!.uid);
+        log('sign in success');
+        Navigator.pop(context);
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -56,16 +55,19 @@ class FirebaseAuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getCurrentAdminId() async {
-    final user = _auth.currentUser;
-    if (user != null) {
-      final userDoc = await _fireStore.collection('admin').doc(user.uid).get();
-      // _adminId = user.uid;
-      notifyListeners();
-      if (userDoc.exists) {
-        _adminId = user.uid;
-        notifyListeners(); // Return the adminId
-      }
+  Future<void> signOut(BuildContext context) async {
+    try {
+      loadingDialog(context);
+      await _auth.signOut();
+      Navigator.pop(context);
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ScreenLogin(),
+          ));
+      log("Sign Out Successful");
+    } catch (e) {
+      log("Error during sign out: $e");
     }
   }
 }
