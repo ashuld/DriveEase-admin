@@ -34,23 +34,22 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ResponsiveSizer(builder:
-        (BuildContext context, Orientation orientation, ScreenType screenType) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'DriveEase-Admin',
-        theme: ThemeData(
-          appBarTheme: const AppBarTheme(
-              centerTitle: true,
-              iconTheme:
-                  IconThemeData(color: AppColors.primaryColor, size: 30)),
-          fontFamily: GoogleFonts.urbanist().fontFamily,
-          dialogBackgroundColor: AppColors.primaryColor,
-          scaffoldBackgroundColor: AppColors.primaryColor,
-          useMaterial3: true,
-        ),
-        home: const AuthWrapper(),
-      );
-    });
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'DriveEase-Admin',
+      theme: ThemeData(
+        appBarTheme: const AppBarTheme(
+            centerTitle: true,
+            iconTheme: IconThemeData(color: AppColors.primaryColor, size: 30)),
+        fontFamily: GoogleFonts.urbanist().fontFamily,
+        dialogBackgroundColor: AppColors.primaryColor,
+        scaffoldBackgroundColor: AppColors.primaryColor,
+        useMaterial3: true,
+      ),
+      home: ResponsiveSizer(builder: (BuildContext context,
+          Orientation orientation, ScreenType screenType) {
+        return const AuthWrapper();
+      }),
+    );
   }
 }
